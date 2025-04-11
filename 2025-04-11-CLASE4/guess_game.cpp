@@ -8,25 +8,34 @@ Informar si lo adivino o no
 */
 
 #include <iostream>
+#include <random>
 
 //declaracion
-void juego(int success);
+void juego(int min_val, int max_val);
+
 
 int main(void) {
-    juego(10);
-    juego(25);
+    juego(1, 100);
+    juego(5, 75);
 
     return 0;
 }
 
 //Implementacion
-void juego(int success)
+void juego(int min_val, int max_val)
 {
-    const int NUM = success;
+    //colocar el numero aleatorio
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int>distro(min_val, max_val);
+
+    const int NUM = distro(gen);
     int guessed_number = NUM/2;
 
-    const int MIN = 1;
-    const int MAX = 100;
+    const int MIN = min_val;
+    const int MAX = max_val;
+
+    std::cout <<"\nINICIA EL JUEGO\n";
 
     while(guessed_number != NUM){
         std::cout <<"Adivina un numero entre " << MIN << " y " << MAX << ":\n";
