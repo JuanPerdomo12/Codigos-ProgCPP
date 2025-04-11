@@ -20,10 +20,10 @@ int main(void) {
 
         // validacion del rango 
         if (guessed_number < 1 or guessed_number>100){
-            std::cout << "Estas fuera del rango. ¡Se termina el juego!\n";
-            break;
+            std::cout << "Estas fuera del rango. Vuele a intentarlo.\n";
+            continue;
         }
-        
+
         if (guessed_number == NUM){
             std::cout <<"GANASTE!!!\n";
         } else if (guessed_number > NUM){
