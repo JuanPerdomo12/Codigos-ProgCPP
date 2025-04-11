@@ -19,14 +19,11 @@ int main(void) {
         //std::cout <<"Escribiste: " << guessed_number << "\n";
 
         // validacion del rango 
-        if (guessed_number < 1){
-            std::cout << "Estas fuera del rango. ¡Se termina el juego!\n";
-            break;
-        } else if (guessed_number > 100){
+        if (guessed_number < 1 or guessed_number>100){
             std::cout << "Estas fuera del rango. ¡Se termina el juego!\n";
             break;
         }
-
+        
         if (guessed_number == NUM){
             std::cout <<"GANASTE!!!\n";
         } else if (guessed_number > NUM){
