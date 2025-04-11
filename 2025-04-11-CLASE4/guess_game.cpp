@@ -9,7 +9,18 @@ Informar si lo adivino o no
 
 #include <iostream>
 
+//declaracion
+void juego(void);
+
 int main(void) {
+    juego();
+
+    return 0;
+}
+
+//Implementacion
+void juego(void)
+{
     const int NUM = 10;
     int guessed_number = NUM/2;
 
@@ -35,6 +46,4 @@ int main(void) {
             std::cout <<"Te falta\n";
     }
     }
-
-    return 0;
 }
