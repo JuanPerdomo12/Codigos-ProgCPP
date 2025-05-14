@@ -123,18 +123,26 @@ double gauss2(double a, double b, fptr f){
 }
 
 double gauss3(double a, double b, fptr f){
+    // aux
+    double aux1 = (b - a)/2.0;
+    double aux2 = (b + a)/2.0;
+
     //define point coordinates
-    double x0 = -std::sqrt(3.0/5.0);
-    double x1 = 0.0;
-    double x2 = +std::sqrt(3.0/5.0);
+    std::vector<double> x(3);
+    x[0] = -std::sqrt(3.0/5.0);
+    x[1] = 0.0;
+    x[2] = +std::sqrt(3.0/5.0);
 
     //define weights
-    double w0 = 5.0/9.0;
-    double w1 = 8.0/9.0;
-    double w2 = 5.0/9.0;
+    std::vector<double> w(3);
+    w[0] = 5.0/9.0;
+    w[1] = 8.0/9.0;
+    w[2] = 5.0/9.0;
 
     //capture integral
-    double result = (b - a)/2.0 * (w0 * f(((b - a) * x0)/2.0 + (a + b)/2.0) + w1 * f(((b - a) * x1)/2.0 + (a + b)/2.0) 
-    + w2 * f(((b - a) * x2)/2.0 + (a + b)/2.0));
-    return result;
+    double result = 0.0;
+    for(int k = 0; k < 3; ++k){
+        result = result + w[k] * f(aux1 * x[k] + aux2);
+    }
+    return aux1 * result;
 }
