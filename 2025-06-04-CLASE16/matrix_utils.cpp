@@ -66,3 +66,36 @@ void matrix_matrix_multi(const std::vector<double> & M1, const std::vector<doubl
                 }
             }
 
+void identity_matrix(std::vector<double> & I, int nrows){
+    std::cout.setf(std::ios::scientific);
+    std::cout.precision(15);
+
+    I.resize(nrows*nrows, 0.0);
+
+    for (int ii = 0; ii < nrows; ++ii) {
+        for (int jj = 0; jj < nrows; ++jj) {
+            if (ii == jj){
+                I[ii*nrows+jj]=1.0;
+            }
+        }
+    }
+}
+
+bool check_inverse(const std::vector<double> & A, const std::vector<double> & B, const std::vector<double> & I_n, double epsilon, int n){
+    std::vector<double> C;
+    std::vector<double> D;
+    matrix_matrix_multi(A,B,C,n,n,n,n);
+    for(int ii = 0; ii < n; ii++){
+        for(int jj = 0; jj < n; jj++){
+            D[ii*n+jj] = C[ii*n+jj] - I_n[ii*n+jj];         
+        }
+    }
+    for(int ii = 0; ii < n; ii++){
+        for(int jj = 0; jj < n; jj++){
+            if (D[ii*n+jj] > epsilon or D[ii*n+jj] < -epsilon){
+            return false;
+        }
+    }
+    }
+    return true;
+}
