@@ -19,17 +19,19 @@ Eigen::Matrix<double, 2, 2> operator_A(double R1, double R2, double n, double d)
 int main(int argc, char **argv) {
     const double R1 = std::stod(argv[1]);
     const double R2 = std::stod(argv[2]);
-    const double n = std::stod(argv[3]);
-    const double d = std::stod(argv[4]);
+    const double d = std::stod(argv[3]);
 
+    for (double n = 1; n <= 3; n+= 0.5){
     Eigen::Matrix2d A = operator_A(R1, R2, n, d);
 
-    std::cout << "Matrix A: \n" << A << std::endl;
+    std::cout << "Matrix A with n " << n << ": \n" << A << std::endl;
 
     double det_A = A.determinant();
     double val_1_2 = -A(0,1);
     
     std::cout << "det: " << det_A << std::endl;
-    std::cout << "1/f: " << val_1_2<< std::endl; 
+    std::cout << "1/f: " << val_1_2<< std::endl;
+    std::cout << "\n" ;
+    }
     return 0;
 }
