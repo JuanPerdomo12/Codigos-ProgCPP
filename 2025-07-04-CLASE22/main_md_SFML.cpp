@@ -1,4 +1,4 @@
-// g++ -std=c++17 -g particle.cpp main_visual_md.cpp -lsfml-window -lsfml-graphics -lsfml-system
+// g++ -std=c++17 -g particle.cpp main_md_SFML.cpp -lsfml-window -lsfml-graphics -lsfml-system
 #include "particle.h"
 #include "integrator.h"
 #include "collider.h"
@@ -8,12 +8,12 @@
 
 #include <SFML/Graphics.hpp>
 
-void initial_conditions(std::vector<Particle> & particles);
+void initial_conditions(std::vector<Particle> & particles, int seed);
 
 int main(int argc, char **argv) {
-  const int N = 4;
+  const int N = 200;
   std::vector<Particle> bodies;
-  bodies.resize(N); // only one particle for now
+  bodies.resize(N); 
 
   // parameters
   std::map<std::string, double> p;
@@ -37,15 +37,16 @@ int main(int argc, char **argv) {
   Boundary bc(2.345, 0.0, 0.0, 0.0, 1.0, 0.9); // RMAX, CX, CY, CZ, EN, ET
 
   // initial conditions and properties
-  initial_conditions(bodies);
+  const int seed = std::stoi(argv[1]);
+  initial_conditions(bodies, seed);
   collider.computeForces(bodies); // force at t = 0
   integrator.startIntegration(bodies); // start integration algorithm
-  std::cout << p["T0"] << "\t";
-  bodies[0].print();
-  std::cout << "\n";
-  std::cout << p["T0"] << "\t";
-  bodies[1].print();
-  std::cout << "\n";
+  //std::cout << p["T0"] << "\t";
+  //bodies[0].print();
+  //std::cout << "\n";
+  //std::cout << p["T0"] << "\t";
+  //bodies[1].print();
+  //std::cout << "\n";
 
   // --- VISUALIZATION SETUP ---
   sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "C++ Simulation & Visualization");
@@ -55,16 +56,24 @@ int main(int argc, char **argv) {
   particle_shape.setOrigin(0, 0);
 
   // color setup
-  // create array for RGB
-  std::vector<sf::Uint8> R(N, 0), G(N, 0), B(N, 0);
+  std::vector<sf::Color> particle_colors(N);
 
-  //random fill
-  const int seed = std::stoi(argv[1]);
-  std::mt19937 eng(seed);
-  std::uniform_int_distribution<sf::Uint8> dist(0, 255);
-  for (int ip = 0; ip < N; ip++) R[ip] = dist(eng);
-  for (int ip = 0; ip < N; ip++) G[ip] = dist(eng);
-  for (int ip = 0; ip < N; ip++) B[ip] = dist(eng);
+  // rad max and min
+  double min_rad = bodies[0].rad, max_rad = bodies[0].rad;
+  for (const auto& p : bodies) {
+    if (p.rad < min_rad) min_rad = p.rad;
+    if (p.rad > max_rad) max_rad = p.rad;
+  }
+
+  // fill for size
+  for (int i = 0; i < N; i++) {
+    double normalized = (bodies[i].rad - min_rad) / (max_rad - min_rad);
+    particle_colors[i] = sf::Color(
+      255 * normalized,       // R goes up
+      0,                     // G cte
+      255 * (1 - normalized)  // B goes down
+    );
+  }
 
   // Time iteration
   const int niter = int((p["TF"] - p["T0"])/p["DT"]);
@@ -89,8 +98,7 @@ int main(int argc, char **argv) {
       // Center the origin so setPosition() refers to the center of the circle
       particle_shape.setOrigin(pixel_radius, pixel_radius);
       // color
-      sf::Color c = {R[ip], G[ip], B[ip]};
-      particle_shape.setFillColor(c);
+      particle_shape.setFillColor(particle_colors[ip]);
 
       // Convert world coordinates to screen coordinates
       sf::Vector2f screen_pos;
@@ -114,29 +122,27 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-void initial_conditions(std::vector<Particle> & particles)
+void initial_conditions(std::vector<Particle> & particles, int seed)
 {
-  particles[0].R[2] = 0.987;  // z is upwards, x to the right
-  particles[0].V[0] = 4.9876;//12.987; // z is upwards, x to the right
-  particles[0].V[2] = 0.0; //4.9876; //3.987; // z is upwards, x to the right
-  particles[0].rad  = 0.103;
-  particles[0].mass = 0.337;
+  std::mt19937 gen(seed);
+  std::uniform_real_distribution<double> pos_dist(-1.0, 1.0);
+  std::uniform_real_distribution<double> vel_dist(-5.0, 5.0);
+  std::uniform_real_distribution<double> rad_dist(0.05, 0.15);
+  std::uniform_real_distribution<double> mass_dist(0.1, 0.5);
 
-  particles[1].R[2] = -0.287;  // z is upwards, x to the right
-  particles[1].V[0] = 2.9876;//12.987; // z is upwards, x to the right
-  particles[1].V[2] = 3.3457; //4.9876; //3.987; // z is upwards, x to the right
-  particles[1].rad  = 0.153;
-  particles[1].mass = 0.337;
+  for (auto & p : particles) {
+    // positions
+    p.R[0] = pos_dist(gen);
+    p.R[1] = pos_dist(gen);
+    p.R[2] = pos_dist(gen);
 
-  particles[2].R[2] = 0.187;  // z is upwards, x to the right
-  particles[2].V[0] = 4.9876;//12.987; // z is upwards, x to the right
-  particles[2].V[2] = 2.0; //4.9876; //3.987; // z is upwards, x to the right
-  particles[2].rad  = 0.83;
-  particles[2].mass = 0.137;
+    //velocities
+    p.V[0] = vel_dist(gen);
+    p.V[1] = vel_dist(gen);
+    p.V[2] = vel_dist(gen);
 
-  particles[3].R[2] = -0.987;  // z is upwards, x to the right
-  particles[3].V[0] = 4.9876;//12.987; // z is upwards, x to the right
-  particles[3].V[2] = 6.9458; //4.9876; //3.987; // z is upwards, x to the right
-  particles[3].rad  = 0.303;
-  particles[3].mass = 0.437;
+    // radius and mass
+    p.rad = rad_dist(gen);
+    p.mass = mass_dist(gen);
+  }
 }
