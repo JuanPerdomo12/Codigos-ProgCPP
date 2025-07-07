@@ -55,10 +55,19 @@ int main(int argc, char **argv) {
 
   // --- VISUALIZATION SETUP ---
   sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "C++ Simulation & Visualization");
-  window.setFramerateLimit(240);
+  window.setFramerateLimit(120);
+
   sf::CircleShape particle_shape(bodies[0].rad);
   particle_shape.setFillColor(sf::Color::Cyan);
   particle_shape.setOrigin(0, 0);
+
+  // anillo de visualizacion externo
+  sf::CircleShape outerCircle(2.345f * METERS_TO_PIXELS);
+  outerCircle.setFillColor(sf::Color::Transparent);
+  outerCircle.setOutlineColor(sf::Color::White);
+  outerCircle.setOutlineThickness(2.0f);
+  outerCircle.setOrigin(outerCircle.getRadius(), outerCircle.getRadius());
+  outerCircle.setPosition(WIDTH / 2.0F, HEIGHT /2.0F);
 
   // color setup
   std::vector<sf::Color> particle_colors(N);
@@ -95,6 +104,7 @@ int main(int argc, char **argv) {
 
     // 2. Run the C++ visualization
     window.clear(sf::Color::Black);
+    window.draw(outerCircle);
     int ip = 0;
     for (const auto& p : bodies) {
       float pixel_radius = p.rad * METERS_TO_PIXELS;
